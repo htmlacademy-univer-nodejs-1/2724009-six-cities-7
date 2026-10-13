@@ -16,10 +16,11 @@ ${chalk.bold.yellow('Команды:')}
   ${chalk.cyan('--help'.padEnd(28))}Показывает справку
   ${chalk.cyan('--version'.padEnd(28))}Показывает версию приложения
   ${chalk.cyan('--import <path>'.padEnd(28))}Импортирует предложения из TSV
-  ${chalk.cyan('--generate <n> <path> <url>'.padEnd(28))}Генерирует данные ${chalk.gray('(следующее задание)')}
+  ${chalk.cyan('--generate <n> <path> <url>'.padEnd(28))}Генерирует предложения в TSV
 
 ${chalk.bold.yellow('Пример:')}
   ${chalk.cyan('npm run cli -- --import')} ${chalk.yellow('mocks/offers.tsv')}
+  ${chalk.cyan('npm run cli -- --generate')} ${chalk.yellow('5 generated/offers.tsv http://127.0.0.1:3000/data')}
 `);
   }
 }
