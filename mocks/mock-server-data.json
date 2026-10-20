@@ -1,0 +1,122 @@
+{
+  "data": {
+    "titles": [
+      "Уютная квартира в центре города",
+      "Светлая комната рядом с парком",
+      "Просторный дом для семейного отдыха",
+      "Современная квартира с красивым видом",
+      "Удобный номер недалеко от вокзала"
+    ],
+    "descriptions": [
+      "Уютное жильё в центре города. Рядом находятся кафе, магазины и остановки общественного транспорта.",
+      "Светлое жильё возле большого парка. Подходит для спокойного отдыха и прогулок по городу.",
+      "Просторное жильё для семейного отдыха. Есть всё необходимое для комфортного проживания.",
+      "Современное жильё с красивым видом из окна. Удобное расположение для знакомства с городом.",
+      "Комфортное жильё недалеко от вокзала. Рядом есть магазины и удобные транспортные маршруты."
+    ],
+    "cities": [
+      {
+        "name": "Paris",
+        "location": {
+          "latitude": 48.85661,
+          "longitude": 2.351499
+        }
+      },
+      {
+        "name": "Cologne",
+        "location": {
+          "latitude": 50.938361,
+          "longitude": 6.959974
+        }
+      },
+      {
+        "name": "Brussels",
+        "location": {
+          "latitude": 50.846557,
+          "longitude": 4.351697
+        }
+      },
+      {
+        "name": "Amsterdam",
+        "location": {
+          "latitude": 52.370216,
+          "longitude": 4.895168
+        }
+      },
+      {
+        "name": "Hamburg",
+        "location": {
+          "latitude": 53.550341,
+          "longitude": 10.000654
+        }
+      },
+      {
+        "name": "Dusseldorf",
+        "location": {
+          "latitude": 51.225402,
+          "longitude": 6.776314
+        }
+      }
+    ],
+    "housingTypes": [
+      "apartment",
+      "house",
+      "room",
+      "hotel"
+    ],
+    "amenities": [
+      "Breakfast",
+      "Air conditioning",
+      "Laptop friendly workspace",
+      "Baby seat",
+      "Washer",
+      "Towels",
+      "Fridge"
+    ],
+    "images": [
+      "img/apartment-01.jpg",
+      "img/apartment-02.jpg",
+      "img/apartment-03.jpg",
+      "img/room.jpg",
+      "img/studio-01.jpg",
+      "img/studio-photos.jpg"
+    ],
+    "authors": [
+      {
+        "name": "uri",
+        "email": "uri@gmail.com",
+        "avatarUrl": "img/avatar-max.jpg",
+        "password": "yuri123",
+        "type": "pro"
+      },
+      {
+        "name": "kashtan",
+        "email": "kashtan@gmail.com",
+        "avatarUrl": "img/avatar-angelina.jpg",
+        "password": "anna123",
+        "type": "regular"
+      },
+      {
+        "name": "tanya",
+        "email": "tanya@gmail.com",
+        "avatarUrl": "img/avatar-max.jpg",
+        "password": "max12345",
+        "type": "regular"
+      },
+      {
+        "name": "bobo",
+        "email": "bobo@gmail.com",
+        "avatarUrl": "img/avatar-angelina.jpg",
+        "password": "olga123",
+        "type": "pro"
+      },
+      {
+        "name": "max",
+        "email": "max@gmail.com",
+        "avatarUrl": "img/avatar-max.jpg",
+        "password": "alex123",
+        "type": "regular"
+      }
+    ]
+  }
+}

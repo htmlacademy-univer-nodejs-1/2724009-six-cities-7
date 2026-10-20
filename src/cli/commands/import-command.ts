@@ -4,6 +4,9 @@ import { TsvOfferReader } from '../../shared/libs/file-reader/index.js';
 import { formatJson } from '../format-json.js';
 import type { CliCommand } from './cli-command.interface.js';
 
+const PREVIEW_LIMIT = 5;
+const PROGRESS_INTERVAL = 100000;
+
 export class ImportCommand implements CliCommand {
   public readonly name = '--import';
 
@@ -26,6 +29,14 @@ export class ImportCommand implements CliCommand {
     for await (const offer of reader.read()) {
       count++;
 
+      if (count > PREVIEW_LIMIT) {
+        if (count % PROGRESS_INTERVAL === 0) {
+          console.log(chalk.gray(`Обработано строк: ${count}`));
+        }
+
+        continue;
+      }
+
       const author = {
         name: offer.author.name,
         email: offer.author.email,
@@ -35,6 +46,10 @@ export class ImportCommand implements CliCommand {
 
       console.log(`\n${chalk.bold.magenta(`Предложение №${count}`)} ${chalk.gray('—')} ${chalk.bold(offer.title)}`);
       console.log(formatJson({ ...offer, author }));
+    }
+
+    if (count > PREVIEW_LIMIT) {
+      console.log(chalk.gray(`Подробно показаны первые ${PREVIEW_LIMIT} предложений; обработаны все записи файла.`));
     }
 
     console.log(`\n${chalk.bold.green(`Обработано предложений: ${count}`)}`);

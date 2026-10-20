@@ -11,6 +11,12 @@ export class TsvOfferReader implements FileReader<Offer> {
     const input = createReadStream(this.filePath, { encoding: 'utf-8' });
     const lines = createInterface({ input, crlfDelay: Infinity });
     let lineNumber = 0;
+    let readError: Error | undefined;
+
+    input.on('error', (error: Error) => {
+      readError = error;
+      lines.close();
+    });
 
     try {
       for await (const line of lines) {
@@ -31,6 +37,10 @@ export class TsvOfferReader implements FileReader<Offer> {
         }
 
         yield offer;
+      }
+
+      if (readError) {
+        throw readError;
       }
     } finally {
       lines.close();
