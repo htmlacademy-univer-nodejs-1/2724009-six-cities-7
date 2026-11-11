@@ -1,57 +1,81 @@
 import { extname } from 'node:path';
+import { access } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import chalk from 'chalk';
 import { TsvOfferReader } from '../../shared/libs/file-reader/index.js';
-import { formatJson } from '../format-json.js';
+import type { DatabaseClient } from '../../shared/libs/database-client/database-client.interface.js';
+import type { UserService } from '../../shared/modules/user/user-service.interface.js';
+import type { OfferService } from '../../shared/modules/offer/offer-service.interface.js';
 import type { CliCommand } from './cli-command.interface.js';
 
-const PREVIEW_LIMIT = 5;
 const PROGRESS_INTERVAL = 100000;
+
+type ImportDependencies = {
+  databaseClient: DatabaseClient;
+  userService: UserService;
+  offerService: OfferService;
+  getSalt: () => string;
+  initializeModels: () => Promise<void>;
+};
 
 export class ImportCommand implements CliCommand {
   public readonly name = '--import';
 
-  public async run(...args: string[]): Promise<void> {
-    const [filePath] = args;
+  constructor(private readonly dependencies: ImportDependencies) {}
 
-    if (args.length !== 1 || !filePath.trim()) {
-      throw new Error('Использование: --import <path>. Укажи путь к одному TSV-файлу');
+  public async run(...args: string[]): Promise<void> {
+    if (args.length !== 2 || args.some((arg) => !arg.trim())) {
+      throw new Error('Использование: --import <path> <mongodb-uri>');
     }
+
+    const [filePath, uri] = args;
 
     if (extname(filePath).toLowerCase() !== '.tsv') {
       throw new Error('Для импорта требуется файл с расширением .tsv');
     }
 
+    if (!/^mongodb(?:\+srv)?:\/\//.test(uri)) {
+      throw new Error('Строка подключения должна начинаться с mongodb:// или mongodb+srv://');
+    }
+
+    await access(filePath, constants.R_OK);
+
+    const { databaseClient, userService, offerService, getSalt, initializeModels } = this.dependencies;
+    const salt = getSalt();
     const reader = new TsvOfferReader(filePath);
     let count = 0;
+    let userCount = 0;
 
-    console.log(`${chalk.bold.magenta('Чтение TSV:')} ${chalk.yellow(filePath)}`);
+    await databaseClient.connect(uri);
 
-    for await (const offer of reader.read()) {
-      count++;
+    try {
+      await initializeModels();
+      console.log(`${chalk.bold.magenta('Импорт TSV:')} ${chalk.yellow(filePath)}`);
 
-      if (count > PREVIEW_LIMIT) {
-        if (count % PROGRESS_INTERVAL === 0) {
-          console.log(chalk.gray(`Обработано строк: ${count}`));
+      for await (const offer of reader.read()) {
+        let author = await userService.findByEmail(offer.author.email);
+
+        if (!author) {
+          author = await userService.create(offer.author, salt);
+          userCount++;
         }
 
-        continue;
+        await offerService.create({ ...offer, author: author._id.toString() });
+        count++;
+
+        if (count % PROGRESS_INTERVAL === 0) {
+          console.log(chalk.gray(`Сохранено предложений: ${count}`));
+        }
       }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Неизвестная ошибка';
 
-      const author = {
-        name: offer.author.name,
-        email: offer.author.email,
-        avatarUrl: offer.author.avatarUrl,
-        type: offer.author.type,
-      };
-
-      console.log(`\n${chalk.bold.magenta(`Предложение №${count}`)} ${chalk.gray('—')} ${chalk.bold(offer.title)}`);
-      console.log(formatJson({ ...offer, author }));
+      throw new Error(`Импорт остановлен. Сохранено предложений: ${count}. ${message}`, { cause: error });
+    } finally {
+      await databaseClient.disconnect();
     }
 
-    if (count > PREVIEW_LIMIT) {
-      console.log(chalk.gray(`Подробно показаны первые ${PREVIEW_LIMIT} предложений; обработаны все записи файла.`));
-    }
-
-    console.log(`\n${chalk.bold.green(`Обработано предложений: ${count}`)}`);
+    console.log(chalk.bold.green(`Импортировано предложений: ${count}`));
+    console.log(chalk.bold.green(`Создано пользователей: ${userCount}`));
   }
 }
