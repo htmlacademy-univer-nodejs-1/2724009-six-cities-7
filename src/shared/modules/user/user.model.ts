@@ -7,6 +7,7 @@ export const userSchema = new Schema<UserEntity>({
   avatarUrl: String,
   password: { type: String, required: true, select: false },
   type: { type: String, required: true },
+  favoriteOffers: { type: [{ type: Schema.Types.ObjectId, ref: 'Offer' }], default: [] },
 }, {
   collection: 'users',
   timestamps: true,
