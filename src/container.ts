@@ -12,6 +12,8 @@ import { DefaultUserService, UserModel } from './shared/modules/user/index.js';
 import type { UserEntity, UserService } from './shared/modules/user/index.js';
 import { DefaultOfferService, OfferModel } from './shared/modules/offer/index.js';
 import type { OfferEntity, OfferService } from './shared/modules/offer/index.js';
+import { DefaultCommentService, CommentModel } from './shared/modules/comment/index.js';
+import type { CommentEntity, CommentService } from './shared/modules/comment/index.js';
 import { Component } from './shared/types/component.js';
 
 export const container = new Container();
@@ -21,6 +23,8 @@ container.bind<Config>(Component.Config).to(RestConfig).inSingletonScope();
 container.bind<DatabaseClient>(Component.DatabaseClient).to(MongoDatabaseClient).inSingletonScope();
 container.bind<Model<UserEntity>>(Component.UserModel).toConstantValue(UserModel);
 container.bind<Model<OfferEntity>>(Component.OfferModel).toConstantValue(OfferModel);
+container.bind<Model<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
 container.bind<UserService>(Component.UserService).to(DefaultUserService).inSingletonScope();
 container.bind<OfferService>(Component.OfferService).to(DefaultOfferService).inSingletonScope();
+container.bind<CommentService>(Component.CommentService).to(DefaultCommentService).inSingletonScope();
 container.bind<Application>(Component.Application).to(Application).inSingletonScope();

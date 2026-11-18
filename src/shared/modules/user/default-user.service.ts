@@ -1,4 +1,4 @@
-import { isObjectIdOrHexString, type Model } from 'mongoose';
+import { isObjectIdOrHexString, Types, type Model } from 'mongoose';
 import { inject, injectable } from 'inversify';
 import { hashPassword } from '../../helpers/hash-password.js';
 import { Component } from '../../types/component.js';
@@ -22,6 +22,7 @@ export class DefaultUserService implements UserService {
       avatarUrl: data.avatarUrl,
       password,
       type: data.type,
+      favoriteOffers: [],
     });
   }
 
@@ -35,5 +36,36 @@ export class DefaultUserService implements UserService {
 
   public async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email: email.trim().toLowerCase() }).exec();
+  }
+
+  public async addFavoriteOffer(userId: string, offerId: string): Promise<UserDocument | null> {
+    if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(offerId)) {
+      return null;
+    }
+
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favoriteOffers: new Types.ObjectId(offerId) } },
+      { new: true },
+    ).exec();
+  }
+
+  public async removeFavoriteOffer(userId: string, offerId: string): Promise<UserDocument | null> {
+    if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(offerId)) {
+      return null;
+    }
+
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { favoriteOffers: new Types.ObjectId(offerId) } },
+      { new: true },
+    ).exec();
+  }
+
+  public async removeOfferFromFavorites(offerId: string): Promise<void> {
+    await this.userModel.updateMany(
+      { favoriteOffers: new Types.ObjectId(offerId) },
+      { $pull: { favoriteOffers: new Types.ObjectId(offerId) } },
+    ).exec();
   }
 }
